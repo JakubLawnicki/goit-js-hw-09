@@ -1,5 +1,8 @@
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
+import Notiflix from 'notiflix';
+
+Notiflix.Notify.init({});
 
 function convertMs(ms) {
   const second = 1000;
@@ -44,7 +47,7 @@ const options = {
   minuteIncrement: 1,
   onClose(selectedDates) {
     if (options.defaultDate >= selectedDates[0]) {
-      window.alert('Please choose a date in the future');
+      Notiflix.Notify.failure('Please choose a date in the future');
     } else {
       startButton.removeAttribute('disabled');
     }
