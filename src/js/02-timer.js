@@ -4,6 +4,15 @@ import Notiflix from 'notiflix';
 
 Notiflix.Notify.init({});
 
+const input = document.querySelector('#datetime-picker');
+const startButton = document.querySelector('button[data-start]');
+startButton.setAttribute('disabled', 'disabled');
+let userTime;
+const daysValue = document.querySelector('span[data-days]');
+const hoursValue = document.querySelector('span[data-hours]');
+const minutesValue = document.querySelector('span[data-minutes]');
+const secondsValue = document.querySelector('span[data-seconds]');
+
 function convertMs(ms) {
   const second = 1000;
   const minute = second * 60;
@@ -15,30 +24,12 @@ function convertMs(ms) {
   const minutes = Math.floor(((ms % day) % hour) / minute);
   const seconds = Math.floor((((ms % day) % hour) % minute) / second);
 
-  daysValue.textContent = days;
-  hoursValue.textContent = hours;
-  minutesValue.textContent = minutes;
-  secondsValue.textContent = seconds;
-
   return { days, hours, minutes, seconds };
 }
 
-// function addLeadingZero(days) {
-//   if (days < 10) {
-//     daysValue.textContent = days.toString().padStart(2, '0');
-//   } else {
-//     daysValue.textContent = days;
-//   }
-// }
-
-const input = document.querySelector('#datetime-picker');
-const startButton = document.querySelector('button[data-start]');
-startButton.setAttribute('disabled', 'disabled');
-let userTime;
-const daysValue = document.querySelector('span[data-days]');
-const hoursValue = document.querySelector('span[data-hours]');
-const minutesValue = document.querySelector('span[data-minutes]');
-const secondsValue = document.querySelector('span[data-seconds]');
+function addLeadingZero(number) {
+  return number.toString().padStart(2, '0');
+}
 
 const options = {
   enableTime: true,
@@ -58,8 +49,21 @@ const options = {
 flatpickr(input, options);
 
 startButton.addEventListener('click', () => {
-  setInterval(() => {
+  const interval = setInterval(() => {
+    const timeLeft = userTime - Date.parse(options.defaultDate);
     options.defaultDate = new Date();
-    convertMs(userTime - Date.parse(options.defaultDate));
+    const { days, hours, minutes, seconds } = convertMs(timeLeft);
+    daysValue.textContent = addLeadingZero(days);
+    hoursValue.textContent = addLeadingZero(hours);
+    minutesValue.textContent = addLeadingZero(minutes);
+    secondsValue.textContent = addLeadingZero(seconds);
+
+    if (timeLeft < 1) {
+      clearInterval(interval);
+      daysValue.textContent = '00';
+      hoursValue.textContent = '00';
+      minutesValue.textContent = '00';
+      secondsValue.textContent = '00';
+    }
   }, 1000);
 });
